@@ -149,6 +149,8 @@ adb shell settings put secure location_providers_allowed -gps   # localizacao em
 adb shell cmd package compile -m speed-profile com.android.chrome   # e launcher3, youtube.kids, settings
 ```
 
+Depois das medidas, a pedido do dono, as três escalas de animação foram para **0** (sem transições de tela). O papel de parede já era estático (`ImageWallpaper`). O Android 7 não tem a opção de acessibilidade "Remover animações", que só chegou no Android 9.
+
 A compilação respondeu `Success` em 0 a 1 s, sem mudar o espaço livre: os apps já estavam compilados. Esse passo não teve efeito. Os ajustes continuaram valendo depois de reiniciar.
 
 [`restaurar-HDT-7427GH.bat`](../restaurar-HDT-7427GH.bat) desfaz os ajustes.

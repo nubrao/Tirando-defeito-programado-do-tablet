@@ -79,7 +79,7 @@ FASE 3: APLICAR
 1. Registre as medidas de "antes" em medidas.txt, anotando o tempo de aparelho ligado.
 2. Remoção: pm uninstall -k --user 0 PACOTE, em grupos (scripts/aplicar-grupo.sh). Grave em removidos.txt só o que saiu com Success.
 3. Depois de cada grupo: dumpsys window | grep mCurrentFocus deve mostrar a tela inicial. Se aparecer "Application Not Responding", confira no logcat se o ANR é anterior à mudança antes de concluir qualquer coisa.
-4. Ajustes aprovados: wifi_scan_always_enabled 0, ble_scan_always_enabled 0, animações 0.5.
+4. Ajustes aprovados: wifi_scan_always_enabled 0, ble_scan_always_enabled 0, animações 0.5 (ou 0 se eu pedir tela sem transições; avise que alguns indicadores de carregamento ficam parados). Confira se o papel de parede é animado (dumpsys wallpaper).
 5. Compilação só dos apps principais: cmd package compile -m speed-profile PACOTE.
 6. adb reboot, aguarde sys.boot_completed = 1.
 

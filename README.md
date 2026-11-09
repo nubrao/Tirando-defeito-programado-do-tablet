@@ -41,6 +41,7 @@ Medidas pelo ADB com o tablet parado, **ambas com 27 minutos de tablet ligado**.
 | Carga média (1 min) | 9,4 | 7,4 |
 | Abrir Configurações (3 vezes) | 1937 / 1632 / 1720 ms | **878 / 907 / 882 ms** |
 | Abrir Chrome a frio (2 vezes) | 47,6 s / 6,4 s | **5,0 s / 2,8 s** |
+| Animações (janela, transição, duração) | 1.0 (padrão) | 0.5 nas medidas; depois **0 (desativadas)** a pedido do dono |
 | Busca de Wi-Fi e Bluetooth em segundo plano | ligada | desligada |
 | Localização | Alta precisão (GPS + rede) | Economia de bateria (só rede) |
 | ANRs do Play Services | pelo menos 2 (18:01 e 18:02) | 4, todos nos primeiros 7 min após reiniciar; nenhum entre 7 e 27 min |
@@ -136,12 +137,12 @@ bash scripts/varredura-android7.sh SERIAL resultados
 # Remover um grupo (pare e leia a seção "o caminho de volta" se o teste acima falhar)
 CONFIRMO_SEM_VOLTA=1 bash scripts/aplicar-grupo.sh SERIAL "Grupo A - ADUPS" com.adups.fota com.adups.fota.sysoper
 
-# Ajustes
+# Ajustes (animações em 0 = sem transições; use 0.5 se preferir só mais curtas)
 ./platform-tools/adb.exe shell settings put global wifi_scan_always_enabled 0
 ./platform-tools/adb.exe shell settings put global ble_scan_always_enabled 0
-./platform-tools/adb.exe shell settings put global window_animation_scale 0.5
-./platform-tools/adb.exe shell settings put global transition_animation_scale 0.5
-./platform-tools/adb.exe shell settings put global animator_duration_scale 0.5
+./platform-tools/adb.exe shell settings put global window_animation_scale 0
+./platform-tools/adb.exe shell settings put global transition_animation_scale 0
+./platform-tools/adb.exe shell settings put global animator_duration_scale 0
 ./platform-tools/adb.exe shell settings put secure location_providers_allowed -gps   # Economia de bateria
 
 ./platform-tools/adb.exe reboot
