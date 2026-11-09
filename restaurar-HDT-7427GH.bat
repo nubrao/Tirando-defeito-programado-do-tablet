@@ -9,6 +9,7 @@ if exist "%~dp0platform-tools\adb.exe" set ADB="%~dp0platform-tools\adb.exe"
 %ADB% shell settings put global window_animation_scale 1.0
 %ADB% shell settings put global transition_animation_scale 1.0
 %ADB% shell settings put global animator_duration_scale 1.0
+%ADB% shell settings put secure location_providers_allowed +gps
 
 echo.
 echo Configuracoes restauradas.

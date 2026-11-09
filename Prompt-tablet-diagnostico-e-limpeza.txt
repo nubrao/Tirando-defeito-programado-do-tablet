@@ -41,6 +41,7 @@ NOTAS TÉCNICAS (aprendidas no Hyundai Maestro HDT-7427GH, Android 7.0, MediaTek
 - /sys/class/thermal, zram e /data/app dão Permission denied sem root.
 - dumpsys diskstats no Android 7 não lista tamanho por app; use Data-Free.
 - Apps de sistema de firmware MediaTek costumam ser odex (APK sem classes.dex). pm install -r do APK de /system falha com "code is missing".
+- Localização no Android 7: settings secure location_mode não existe (null). Economia de bateria = settings put secure location_providers_allowed -gps (volta com +gps); confira na tela Configurações > Local > Modo.
 - cmd package compile -m speed-profile PACOTE existe; se responder Success em 0 s, o app já estava compilado.
 - Chrome 119 é a última versão para Android 7.0. Se o WebView do Google estiver desativado, o Chrome é o provedor do WebView e não pode sair.
 - Google Play Services atual em aparelho de 1 GB causa "não está respondendo" (ANR) com frequência. Confira em logcat "ANR in" e a hora, para separar do efeito das suas mudanças.

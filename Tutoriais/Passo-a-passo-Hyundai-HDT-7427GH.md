@@ -145,6 +145,7 @@ adb shell settings put global ble_scan_always_enabled 0
 adb shell settings put global window_animation_scale 0.5
 adb shell settings put global transition_animation_scale 0.5
 adb shell settings put global animator_duration_scale 0.5
+adb shell settings put secure location_providers_allowed -gps   # localizacao em Economia de bateria
 adb shell cmd package compile -m speed-profile com.android.chrome   # e launcher3, youtube.kids, settings
 ```
 

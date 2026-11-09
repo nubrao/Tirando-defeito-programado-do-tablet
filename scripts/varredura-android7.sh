@@ -68,5 +68,8 @@ r "ANIMACOES E DISPLAY" 'for k in window_animation_scale transition_animation_sc
 r "ATUALIZACAO DE SISTEMA / OTA (pacotes)" 'pm list packages --user 0 | grep -iE "ota|update|fota|adups|systemupdate"'
 r "PROCESSOS EM EXECUCAO (top 1 amostra)" 'top -n 1 -m 25 2>&1'
 
+# Oculta IPs (v4 e v6), coordenadas e forca do sinal antes de guardar
+sed -i -E 's/-?[0-9]{1,3}[,.][0-9]{5,}/<coord>/g; s/([0-9a-f]{0,4}:){3,7}[0-9a-f]{0,4}(\/[0-9]+)?/<ipv6>/gi; s/([0-9]{1,3}\.){3}[0-9]{1,3}/<ip>/g; s/SignalStrength: -?[0-9]+/SignalStrength: <oculto>/' "$F"
+
 A pm list packages -e --user 0 | sort > "$OUT/antes.txt"
 echo "ok: $F"

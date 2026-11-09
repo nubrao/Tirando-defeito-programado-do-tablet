@@ -42,6 +42,7 @@ Medidas pelo ADB com o tablet parado. O "antes" foi medido com 27 minutos de tab
 | Abrir Configurações (3 vezes) | 1937 / 1632 / 1720 ms | 5354 / 5156 / 1284 ms |
 | Abrir Chrome a frio (2 vezes) | 47,6 s / 6,4 s | sem leitura / 6,1 s |
 | Busca de Wi-Fi e Bluetooth em segundo plano | ligada | desligada |
+| Localização | Alta precisão (GPS + rede) | Economia de bateria (só rede) |
 | ANRs do Play Services | pelo menos 2 (18:01 e 18:02) | 4 nos primeiros 7 min após reiniciar |
 
 Até aqui, **nenhuma medida mostra o tablet mais rápido**. O ganho comprovado é o de software: 18 pacotes desnecessários a menos, sem atualizador com analytics, sem localização da Baidu e sem ferramentas de fábrica. O espaço livre caiu 100 MB por causa das atualizações e da compilação da Play Store, não da limpeza.
@@ -53,7 +54,7 @@ Situação de cada parte:
 | Varredura de segurança | Funciona | Rodou de ponta a ponta |
 | Remoção de 18 pacotes | Funciona | `Success` em todos; tela inicial respondeu depois de cada grupo; reiniciou normal |
 | Wi-Fi depois das remoções | Funciona | Conectado e validado, ping de 26 ms |
-| Ajustes (busca de Wi-Fi/BLE, animações) | Funciona | Continuaram valendo depois de reiniciar |
+| Ajustes (busca de Wi-Fi/BLE, animações, localização) | Funciona | Continuaram valendo depois de reiniciar |
 | Compilação dos apps principais | Sem efeito | Já estavam compilados |
 | Limpeza de cache (`pm trim-caches`) | Indisponível | Android 7 nega a permissão |
 | Reverter as remoções por ADB | **Indisponível** | Só com restauração de fábrica ([detalhes](#antes-de-remover-o-caminho-de-volta)) |
@@ -139,6 +140,7 @@ CONFIRMO_SEM_VOLTA=1 bash scripts/aplicar-grupo.sh SERIAL "Grupo A - ADUPS" com.
 ./platform-tools/adb.exe shell settings put global window_animation_scale 0.5
 ./platform-tools/adb.exe shell settings put global transition_animation_scale 0.5
 ./platform-tools/adb.exe shell settings put global animator_duration_scale 0.5
+./platform-tools/adb.exe shell settings put secure location_providers_allowed -gps   # Economia de bateria
 
 ./platform-tools/adb.exe reboot
 ```
