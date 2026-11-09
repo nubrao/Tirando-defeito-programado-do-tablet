@@ -1,0 +1,47 @@
+PACOTES REMOVIDOS DE UM TABLET HYUNDAI MAESTRO TAB HDT-7427GH (Android 7.0, MediaTek MT8321/MT6580) EM 09/11/2026
+Tablet so com Wi-Fi (sem chip), conta Google pessoal, Play Store, uso infantil.
+Firmware HDT_7427GH.20180123, patch de seguranca 2017-11-05.
+Confira cada pacote no seu aparelho antes de remover. Todos foram removidos so do
+usuario 0 (pm uninstall -k --user 0). Os arquivos continuam em /system.
+COMO VOLTAR NESTE ANDROID 7.0: so com restauracao de fabrica. "pm install-existing" e
+"cmd package install-existing" nao existem nesta versao, e os APKs sao odex (sem classes.dex),
+entao "pm install -r /system/.../X.apk" falha com "code is missing". Em Android 8 ou mais novo:
+adb shell cmd package install-existing PACOTE
+
+ATUALIZADOR CHINES COM ANALYTICS (grupo A)
+com.adups.fota                                   ADUPS FOTA: atualizador de sistema com modulo de analytics/trafego. Ultimo firmware e de 2018
+com.adups.fota.sysoper                           ADUPS: servico de sistema que reinicia em recovery para aplicar OTA
+
+LOCALIZACAO DE TERCEIRO SEM USO (grupo B)
+com.baidu.map.location                           Baidu Network Location: INTERNET + WRITE_SECURE_SETTINGS; a localizacao ativa era a do Google
+
+SERVICOS DE CHIP EM TABLET SEM CHIP (grupo C)
+com.android.stk                                  SIM Toolkit (menu da operadora)
+com.mediatek.omacp                               Configuracao de APN/MMS por SMS da operadora (OMA CP)
+com.mediatek.simprocessor                        Importa contatos do chip no boot (le contatos e registro de chamadas)
+org.simalliance.openmobileapi.service            Acesso a smartcard/SIM (Open Mobile API)
+org.simalliance.openmobileapi.uicc1terminal      Terminal SIM 1 da Open Mobile API
+org.simalliance.openmobileapi.uicc2terminal      Terminal SIM 2 da Open Mobile API
+org.simalliance.openmobileapi.eseterminal        Terminal do elemento seguro da Open Mobile API
+
+FERRAMENTAS DE FABRICA E TESTE (grupo D)
+com.example                                      AutoDialer de teste de fabrica (permissao CALL_PRIVILEGED)
+com.mediatek.engineermode                        Engineer Mode (ajustes de radio por codigo discado)
+com.mediatek.factorymode                         Teste de fabrica
+com.mediatek.mtklogger                           Coletor de logs de depuracao da MediaTek
+com.mediatek.ygps                                Teste de GPS
+com.mediatek.lbs.em2.ui                          Teste de localizacao (LBS Engineer Mode)
+com.mediatek.bluetooth.dtt                       BtTool, teste de Bluetooth
+com.mediatek.sensorhub.ui                        Teste de sensores
+
+MANTIDOS DE PROPOSITO
+com.mid.autogen                                  Gera endereco de Wi-Fi/Bluetooth no boot (AutoGenAddr/AutoGenIMEI); remover pode quebrar o Wi-Fi
+com.mid.gsensorcali                              Calibracao do acelerometro
+com.mid.gesture                                  Gestos com a tela apagada (na duvida)
+com.mediatek.atci.service                        Interface de comandos AT (na duvida)
+com.mediatek.duraspeed                           Gerenciador de segundo plano da MediaTek (o prompt nao mexe em limitador de processos)
+com.mediatek.miravision.ui                       Ajuste de cor da tela
+com.android.chrome                               Unico navegador e provedor do WebView (o WebView do Google ja estava desativado)
+com.google.android.apps.photos                  Unica galeria do tablet
+com.android.phone, com.android.mms.service, providers.telephony   Base de telefonia do Android; nao remover mesmo sem chip
+com.android.fmradio, com.android.dialer, com.android.contacts     Na duvida

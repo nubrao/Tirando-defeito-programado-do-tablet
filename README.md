@@ -1,212 +1,199 @@
-# Celular Android mais limpo, privado e leve
+# Tablet Android antigo mais limpo e seguro para criança
 
-Guia e prompt para diagnosticar e limpar um celular Android pelo computador, sem root. O projeto procura sinais de vírus e de rastreamento, explica por que os anúncios "seguem" você mesmo no modo anônimo, mede a saúde da bateria, remove o excesso de software de fábrica por ADB e confere o resultado com medidas antes e depois.
+Guia, prompt e scripts para diagnosticar e limpar por ADB, sem root, um tablet Android barato e antigo. A varredura procura sinais de vírus e de rastreamento, separa o que é software do que é limite do hardware, remove o software de fábrica que não serve para nada e mede o resultado antes e depois.
 
-Foi feito e testado em um **Samsung Galaxy S22 (SM-S901E)** com Android 16, One UI 8.0 e Snapdragon 8 Gen 1, em outubro de 2026. Em outros modelos, use o [prompt com varredura](#usar-com-um-agente-de-ia) e adapte o que for diferente.
+Foi feito e testado em um **Hyundai Maestro Tab HDT-7427GH** (Android 7.0, MediaTek MT8321, 1 GB de RAM), só com Wi-Fi, em novembro de 2026, para ser usado por uma criança. Em outro modelo, use o [prompt com varredura](#usar-com-um-agente-de-ia) e confira cada pacote.
 
-Inspirado em [cavaleiro-ai/Tirando-defeito-programado-dos-tablets](https://github.com/cavaleiro-ai/Tirando-defeito-programado-dos-tablets), que faz o mesmo para tablets voltados a jogos. Este projeto troca o foco: **segurança, privacidade, armazenamento, câmera e bateria** em um celular de uso diário, com chip, conta Google e conta Samsung.
+Inspirado em [cavaleiro-ai/Tirando-defeito-programado-dos-tablets](https://github.com/cavaleiro-ai/Tirando-defeito-programado-dos-tablets).
 
 ## Conteúdo
 
+- [Resposta curta](#resposta-curta)
 - [Resultados medidos](#resultados-medidos)
 - [O que a varredura encontrou](#o-que-a-varredura-encontrou)
-- [Por que os anúncios seguem você no modo anônimo](#por-que-os-anúncios-seguem-você-no-modo-anônimo)
-- [Por que a lista de um tablet não serve para um celular](#por-que-a-lista-de-um-tablet-não-serve-para-um-celular)
+- [O que foi removido e o que ficou](#o-que-foi-removido-e-o-que-ficou)
+- [Antes de remover: o caminho de volta](#antes-de-remover-o-caminho-de-volta)
 - [O que há no repositório](#o-que-há-no-repositório)
-- [Requisitos](#requisitos)
 - [Passo a passo resumido](#passo-a-passo-resumido)
-- [Ajustes que só você faz no celular](#ajustes-que-só-você-faz-no-celular)
+- [Para entregar o tablet a uma criança](#para-entregar-o-tablet-a-uma-criança)
 - [Usar com um agente de IA](#usar-com-um-agente-de-ia)
 - [Problemas comuns](#problemas-comuns)
 - [Limites](#limites)
 - [Fontes](#fontes)
 - [Licença](#licença)
 
+## Resposta curta
+
+O tablet **não tinha vírus encontrado pelo ADB**. Isso não prova que ele está limpo, mas ele vinha com software de fábrica questionável: um atualizador chinês com módulo de analytics (ADUPS), a localização da Baidu e ferramentas de teste da fábrica. Esses foram removidos.
+
+A lentidão vem do **hardware**. O tablet tem 1 GB de RAM e processador de 2015, e roda um Google Play Services de 2026 que sozinho ocupa cerca de um terço da memória. Nenhuma limpeza por ADB muda isso. Ele serve para YouTube Kids, vídeos e jogos simples. Navegar na web com ele é lento e inseguro.
+
 ## Resultados medidos
 
-Medidas feitas pelo ADB, com o celular parado. O "depois" foi medido 2 minutos após reiniciar.
+Medidas pelo ADB com o tablet parado. O "antes" foi medido com 27 minutos de tablet ligado. O "depois" foi medido 3 minutos após reiniciar, quando o Play Services, a Play Store, o Fotos e o YouTube Kids ainda estão carregando, então ele não é comparável em RAM e tempo de abertura. A medida com o mesmo tempo de ligado (27 min) ainda será publicada.
 
-| Medida | Antes | Depois |
+| Medida | Antes (27 min ligado) | Depois (3 min após reiniciar) |
 | --- | --- | --- |
-| Apps ativos | 513 | 478 |
-| Espaço livre | 81 GB | 98 GB (103 GB no fim do dia) |
-| RAM disponível | 2,87 GB | 3,47 GB |
-| Abrir Configurações (3 vezes) | 425 / 353 / 280 ms | 613 / 183 / 278 ms |
-| DNS com bloqueio de anúncios | configurado, mas inativo | ativo e validado |
+| Apps ativos | 116 | 98 |
+| RAM disponível | 345 MB | 285 MB |
+| Swap livre | 177 MB | 303 MB |
+| Espaço livre (/data) | 2,22 GB | 2,12 GB |
+| Carga média (1 min) | 9,4 | 17 a 22 |
+| Abrir Configurações (3 vezes) | 1937 / 1632 / 1720 ms | 5354 / 5156 / 1284 ms |
+| Abrir Chrome a frio (2 vezes) | 47,6 s / 6,4 s | sem leitura / 6,1 s |
 | Busca de Wi-Fi e Bluetooth em segundo plano | ligada | desligada |
+| ANRs do Play Services | pelo menos 2 (18:01 e 18:02) | 4 nos primeiros 7 min após reiniciar |
 
-O ganho mais sólido é o **espaço livre**: 15,8 GB vieram só da limpeza de cache. A RAM sobe naturalmente logo depois de reiniciar, então parte desse ganho é do reinício. A primeira abertura de um app depois de reiniciar é sempre mais lenta (613 ms). Não houve benchmark, então este projeto não promete um percentual de velocidade.
+Até aqui, **nenhuma medida mostra o tablet mais rápido**. O ganho comprovado é o de software: 18 pacotes desnecessários a menos, sem atualizador com analytics, sem localização da Baidu e sem ferramentas de fábrica. O espaço livre caiu 100 MB por causa das atualizações e da compilação da Play Store, não da limpeza.
 
 Situação de cada parte:
 
 | Parte | Situação | Evidência |
 | --- | --- | --- |
-| Varredura de segurança | Funciona | Rodou de ponta a ponta no S22 |
-| Remoção de 38 pacotes | Funciona | Tela inicial respondeu depois de cada grupo; celular reiniciou normalmente |
-| DNS privado AdGuard | Funciona | Validado pelo Android e com internet ativa |
-| Compilação dos apps | Funciona | `compile -m speed-profile -a` em 4 minutos, sem erro |
-| Ligação, SMS, câmera, Quick Share após as remoções | Não testado pelo ADB | Testar no uso |
-| Efeito sobre anúncios | Não medido | Precisa de alguns dias de observação |
-| Dreno da bateria com a tela apagada | Não medido | |
-| Pasta Segura | Fora do alcance | O ADB não tem acesso a ela |
+| Varredura de segurança | Funciona | Rodou de ponta a ponta |
+| Remoção de 18 pacotes | Funciona | `Success` em todos; tela inicial respondeu depois de cada grupo; reiniciou normal |
+| Wi-Fi depois das remoções | Funciona | Conectado e validado, ping de 26 ms |
+| Ajustes (busca de Wi-Fi/BLE, animações) | Funciona | Continuaram valendo depois de reiniciar |
+| Compilação dos apps principais | Sem efeito | Já estavam compilados |
+| Limpeza de cache (`pm trim-caches`) | Indisponível | Android 7 nega a permissão |
+| Reverter as remoções por ADB | **Indisponível** | Só com restauração de fábrica ([detalhes](#antes-de-remover-o-caminho-de-volta)) |
+| "Google Play Services não está respondendo" | **Continua** | Já acontecia antes; é o limite do hardware |
+| Câmera, som, Bluetooth, YouTube Kids depois das remoções | Não testado pelo ADB | Testar no uso |
 
 ## O que a varredura encontrou
 
-O sistema estava **original e íntegro**: bootloader travado, inicialização verificada "green", Knox nunca violado. Não havia proxy, VPN, serviço de acessibilidade nem administrador de dispositivo estranho. Isso torna improvável um vírus "dentro" do Android. O que apareceu estava em apps, permissões e configurações:
+O sistema estava **original**: bootloader travado, verified boot "green", release-keys. Não havia app de terceiro com acessibilidade, leitura de notificações ou sobreposição, nem proxy, VPN ou Device Owner.
 
 | Achado | Gravidade | O que foi feito |
 | --- | --- | --- |
-| DNS da AdGuard configurado, mas com o modo em "Automático", ou seja, sem bloquear nada | Atenção | Modo trocado para nome do host `dns.adguard-dns.com` |
-| App de "recuperar mensagens apagadas" com acesso a **todas as notificações**, inclusive códigos de banco | Grave | Removido |
-| 9 extensões de um leitor de mangá instaladas fora da loja, sem o app principal | Atenção | Removidas |
-| APK de 103 MB baixado pelo navegador fora da loja, e navegador com permissão para instalar apps | Atenção | APK apagado; permissão de instalar apps tirada do Chrome e do Brave |
-| Pasta de um app conhecido por fraude de anúncios, já desinstalado | Informativo | Pasta apagada |
-| Serviços de fábrica da Meta, personalização e telemetria da Samsung | Atenção | Removidos |
-| Bateria com saúde de **85%**, temperatura máxima registrada de **63,7 °C** e proteção da bateria desligada | Atenção | Proteção ligada pelo usuário; troca ainda não é necessária |
-| 16,8 GB de cache | Informativo | Limpo com `pm trim-caches` |
+| Patch de segurança de **novembro de 2017** e Android 7.0, sem atualização possível | Grave | Nada resolve por software. Não usar para banco, senhas ou compras |
+| Chrome 119, a última versão para Android 7, sem correções desde o fim de 2023. É também o WebView do sistema | Grave | Mantido, porque o sistema precisa dele. Limitar o uso da web |
+| **ADUPS FOTA**: atualizador de fábrica com módulo de analytics e tráfego. O mesmo fornecedor foi flagrado em 2016 enviando dados de celulares. Neste tablet ele não entregava atualização desde 2018 | Grave | Removido |
+| **Baidu Network Location** com internet e permissão para mudar configurações seguras, sem uso | Atenção | Removido |
+| Serviços de chip rodando num tablet sem chip | Atenção | Removidos |
+| Ferramentas de fábrica, incluindo um AutoDialer com permissão de ligação privilegiada e o Engineer Mode | Atenção | Removidos |
+| Busca de Wi-Fi e Bluetooth sempre ligada | Atenção | Desligada |
+| Play Services usando cerca de 320 MB de RAM e travando (ANR) | Atenção | Sem solução por ADB |
+| Conta Google do adulto no tablet da criança | Atenção | Recomendação: [conta infantil](#para-entregar-o-tablet-a-uma-criança) |
 
-Sobre as fotos piores: não havia erro de câmera no registro do sistema. O app Câmera foi atualizado junto com o One UI 8, o que pode ter mudado o processamento de imagem. Calor e bateria desgastada também reduzem o desempenho da câmera. Nenhuma das hipóteses foi provada.
+## O que foi removido e o que ficou
 
-## Por que os anúncios seguem você no modo anônimo
+Lista completa, com a função de cada pacote: [`removidos-HDT-7427GH.txt`](removidos-HDT-7427GH.txt).
 
-O modo anônimo apaga histórico e cookies **do aparelho** quando você fecha a aba. Ele não impede:
+**Removidos (18):** `com.adups.fota`, `com.adups.fota.sysoper`, `com.baidu.map.location`, `com.android.stk`, `com.mediatek.omacp`, `com.mediatek.simprocessor`, `org.simalliance.openmobileapi.service`, `.uicc1terminal`, `.uicc2terminal`, `.eseterminal`, `com.example`, `com.mediatek.engineermode`, `com.mediatek.factorymode`, `com.mediatek.mtklogger`, `com.mediatek.ygps`, `com.mediatek.lbs.em2.ui`, `com.mediatek.bluetooth.dtt`, `com.mediatek.sensorhub.ui`.
 
-- **Login na conta Google** ou pesquisa no Google dentro da aba anônima. A pesquisa fica registrada na conta.
-- **Personalização por conta.** O ID de publicidade do Google e o perfil da Samsung ligam o que você faz em apps aos anúncios.
-- **IP.** Sites e anunciantes reconhecem a sua internet pelo IP. Um DNS com bloqueio reduz rastreadores, mas não esconde o IP. Para isso é preciso VPN.
-- **Apps que rastreiam bastante.** Lojas e redes sociais costumam carregar vários SDKs de anúncio.
-- **Proxy, VPN, certificado instalado ou app com acessibilidade.** Esses conseguem ver o tráfego. A varredura confere cada um.
+**Mantidos de propósito:**
 
-## Por que a lista de um tablet não serve para um celular
-
-A lista do projeto original foi feita para um tablet **sem chip e sem conta Google**. No S22, quase metade dos pacotes dela nem existe mais no One UI 8, e vários são necessários:
-
-| Pacote | Por que fica no celular |
+| Pacote | Por que fica |
 | --- | --- |
-| `com.samsung.android.messaging` | É o app de SMS padrão |
-| `scloud`, `mobileservice` | Conta Samsung, backup e Samsung Wallet |
-| `scs` | Busca e recursos de IA do One UI 8 |
-| `knox.attestation`, `knox.app.networkfilter`, `knox.analytics.uploader` | Wallet, Samsung Pass e apps de banco verificam a segurança do aparelho pelo Knox |
-| `sharelive`, `aware.service` | Quick Share |
-| `forest` | Bem-estar digital; o modo Dormir do Modos e Rotinas depende dele |
-| `app.routines` | Modos e Rotinas |
-| `mimage.photoretouching` | Editor de fotos da Galeria |
-| `themecenter`, `dressroom` | Temas e papéis de parede |
-| `game.gos`, `smartfpsadjuster` | Seguram o calor; num aparelho que já chegou a 63,7 °C, removê-los piora |
+| `com.mid.autogen` | Gera o endereço de Wi-Fi e Bluetooth a cada boot. Sem ele o Wi-Fi pode parar |
+| `com.mid.gsensorcali` | Calibra o acelerômetro (girar a tela) |
+| `com.android.chrome` | Único navegador e WebView do sistema |
+| `com.google.android.apps.photos` | Única galeria do tablet |
+| `com.android.phone`, `mms.service`, `providers.telephony` | Base do Android; o sistema depende deles mesmo sem chip |
+| `com.mediatek.duraspeed` | Gerenciador de segundo plano da MediaTek; o guia não mexe em limitadores de processo |
+| Google Play Services e Play Store | Sem eles, YouTube Kids e Play Store não funcionam |
 
-A lista completa do que saiu está em [`removidos-S22.txt`](removidos-S22.txt).
+## Antes de remover: o caminho de volta
+
+No Android 8 ou mais novo, um app de sistema removido volta com `adb shell cmd package install-existing PACOTE`. **No Android 7.0 deste tablet, não volta:**
+
+- `pm install-existing` e `cmd package install-existing` respondem `Unknown command`.
+- Os APKs de sistema são "odex", sem o código dentro. Por isso `pm install -r /system/.../X.apk` falha com `code is missing`.
+
+O único caminho de volta é a **restauração de fábrica**. Para um tablet que vai para uma criança e não tem dados, isso não custa nada, mas precisa ser decidido antes. O script de remoção deste repositório agora testa isso e para se não houver caminho de volta.
 
 ## O que há no repositório
 
 | Caminho | Conteúdo |
 | --- | --- |
-| `Prompt-celular-diagnostico-e-limpeza.txt` | Prompt para um agente diagnosticar e limpar qualquer celular Android, com a referência do S22 no final |
-| `Tutoriais/Passo-a-passo-Galaxy-S22.md` | Todos os comandos usados no S22, na ordem, com o que cada um mostrou e os problemas encontrados |
-| `removidos-S22.txt` | Os pacotes removidos do S22, com a função de cada um |
-| `restaurar-S22.bat` | Desfaz as configurações e reinstala os pacotes de sistema removidos |
+| `Prompt-tablet-diagnostico-e-limpeza.txt` | Prompt para um agente de IA diagnosticar e limpar um tablet Android antigo, com as notas técnicas do Android 7 |
+| `Tutoriais/Passo-a-passo-Hyundai-HDT-7427GH.md` | Todos os comandos usados, na ordem, com o que cada um mostrou e os problemas encontrados |
+| `scripts/varredura-android7.sh` | Varredura só de leitura, adaptada para Android 7 |
+| `scripts/aplicar-grupo.sh` | Remove um grupo de pacotes para o usuário 0, registra tudo e testa antes se há caminho de volta |
+| `removidos-HDT-7427GH.txt` | Pacotes removidos e mantidos, com a função de cada um |
+| `restaurar-HDT-7427GH.bat` | Desfaz os ajustes de configuração |
 
-## Requisitos
-
-- Celular Android com **Depuração USB** ligada.
-- Computador com o [ADB oficial](https://dl.google.com/android/repository/platform-tools-latest-windows.zip). O script `.bat` é para Windows.
-- Cabo USB de dados.
-- Backup das fotos e conversas antes de remover qualquer coisa.
+A pasta `resultados/` (relatórios com identificadores do aparelho) e `platform-tools/` ficam fora do Git.
 
 ## Passo a passo resumido
 
-Detalhes e saídas em [`Tutoriais/Passo-a-passo-Galaxy-S22.md`](Tutoriais/Passo-a-passo-Galaxy-S22.md).
+Requisitos: Windows com Git Bash, o [ADB oficial](https://dl.google.com/android/repository/platform-tools-latest-windows.zip) extraído em `platform-tools`, cabo USB de dados e a Depuração USB ligada (Configurações > Sobre o tablet > 7 toques em Número da versão; depois Opções do desenvolvedor > Depuração USB).
 
 ```bash
-# Conexão
-adb devices -l
+export MSYS_NO_PATHCONV=1
+./platform-tools/adb.exe devices -l          # pegue o SERIAL
 
-# Segurança (só leitura)
-adb shell getprop ro.build.version.security_patch
-adb shell getprop ro.boot.verifiedbootstate        # green = sistema original
-adb shell pm list packages -i -3 --user 0           # apps e de onde vieram
-adb shell settings get secure enabled_accessibility_services
-adb shell settings get secure enabled_notification_listeners
-adb shell appops query-op REQUEST_INSTALL_PACKAGES allow
-adb shell settings get global http_proxy
-adb shell settings get global private_dns_mode
-adb shell dumpsys device_policy
+# Varredura (só leitura): gera resultados/varredura.txt e antes.txt
+bash scripts/varredura-android7.sh SERIAL resultados
 
-# Bateria (Samsung mostra saúde e temperatura máxima aqui)
-adb shell dumpsys battery
+# Teste o caminho de volta ANTES de remover
+./platform-tools/adb.exe shell pm install-existing com.android.egg
 
-# Guardar a lista atual e remover um pacote só do usuário principal
-adb shell pm list packages -e --user 0 > antes.txt
-adb shell pm uninstall --user 0 NOME.DO.PACOTE
+# Remover um grupo (pare e leia a seção "o caminho de volta" se o teste acima falhar)
+CONFIRMO_SEM_VOLTA=1 bash scripts/aplicar-grupo.sh SERIAL "Grupo A - ADUPS" com.adups.fota com.adups.fota.sysoper
 
-# DNS com bloqueio de anúncios
-adb shell settings put global private_dns_specifier dns.adguard-dns.com
-adb shell settings put global private_dns_mode hostname
+# Ajustes
+./platform-tools/adb.exe shell settings put global wifi_scan_always_enabled 0
+./platform-tools/adb.exe shell settings put global ble_scan_always_enabled 0
+./platform-tools/adb.exe shell settings put global window_animation_scale 0.5
+./platform-tools/adb.exe shell settings put global transition_animation_scale 0.5
+./platform-tools/adb.exe shell settings put global animator_duration_scale 0.5
 
-# Menos rastreio de localização e menos bateria
-adb shell settings put global wifi_scan_always_enabled 0
-adb shell settings put global ble_scan_always_enabled 0
-
-# Animações mais curtas, cache e compilação
-adb shell settings put global window_animation_scale 0.5
-adb shell settings put global transition_animation_scale 0.5
-adb shell settings put global animator_duration_scale 0.5
-adb shell pm trim-caches 999G
-adb shell cmd package compile -m speed-profile -a
-
-adb reboot
+./platform-tools/adb.exe reboot
 ```
 
-**Para reverter um pacote:** `adb shell cmd package install-existing NOME.DO.PACOTE`, ou rode `restaurar-S22.bat`.
+Não remova o Play Services, a Play Store, o Chrome (se for o WebView), o teclado, a tela inicial, a galeria, a base de telefonia nem os pacotes `com.mid.*` que geram endereço de rede e calibram sensores.
 
-Não remova o app de SMS, o telefone, a loja de apps, o Google Play Services, o teclado, o Knox nem nada ligado a banco ou carteira digital.
+## Para entregar o tablet a uma criança
 
-## Ajustes que só você faz no celular
+Estes passos são manuais, na tela do tablet:
 
-O ADB não alcança estes, ou é mais seguro fazer pela tela:
-
-1. **Proteção da bateria:** Configurações → Bateria → Proteção da bateria → Adaptável ou Máximo (80%).
-2. **ID de publicidade:** Configurações → Google → Todos os serviços → Anúncios → Excluir ID de publicidade.
-3. **Certificados:** Segurança e privacidade → Mais configurações de segurança → Ver certificados de segurança → aba Usuário. Certificado que você não instalou permite ler o seu tráfego.
-4. **Play Protect:** Play Store → foto do perfil → Play Protect → Verificar.
-5. **Câmera:** limpar a lente, conferir a película e, em Apps → Câmera → Armazenamento, Limpar cache.
-6. **Navegador (Brave):** ⋮ → Configurações → Escudos e privacidade → Limpar dados de navegação (Todo o período). Bloqueio de rastreadores em Agressivo, bloqueio de fingerprinting ligado, P3A, ping diário e relatórios de diagnóstico desligados. Não use "Limpar dados" na tela do app, que apaga senhas e favoritos.
-7. **Conta Google:** myactivity.google.com para apagar pesquisas, e desligar Atividade na Web e de apps.
+1. **Tire a sua conta Google** do tablet e use uma **conta infantil supervisionada pelo Family Link**. Com a sua conta, a criança tem acesso ao seu Gmail, Drive, fotos e compras. Confira, ao configurar, se o Family Link ainda aceita Android 7.0.
+2. **Play Store:** foto do perfil > Configurações > Autenticação > exigir autenticação para compras. Em Família > Controle da família, limite a classificação dos apps.
+3. **YouTube Kids** no lugar do YouTube.
+4. **Toque em "Aguarde"** quando aparecer "Google Play Services não está respondendo".
+5. **Atualizações da Play Store:** deixe o tablet na tomada e no Wi-Fi de vez em quando para as atualizações rodarem enquanto ninguém usa. Durante a compilação dos apps, ele fica mais lento.
+6. **Certificados:** Configurações > Segurança > Credenciais confiáveis > aba Usuário deve estar vazia.
+7. **Sincronização:** Configurações > Contas > Google: desligue Contatos e Agenda se não usar. O processo de contatos usava 24% da CPU com o tablet parado.
+8. **DNS com filtro:** o Android 7 não tem DNS privado. Para filtrar conteúdo adulto e anúncios, configure no roteador um DNS de família.
 
 ## Usar com um agente de IA
 
-O [`Prompt-celular-diagnostico-e-limpeza.txt`](Prompt-celular-diagnostico-e-limpeza.txt) começa com uma varredura só de leitura, mostra um relatório com as causas prováveis de cada sintoma e só muda algo depois da sua aprovação, item por item. Preencha a parte `DADOS` e cole em um agente com acesso ao terminal do computador ligado ao celular.
+O [`Prompt-tablet-diagnostico-e-limpeza.txt`](Prompt-tablet-diagnostico-e-limpeza.txt) começa com uma varredura só de leitura, mostra um relatório com as causas de cada sintoma e só muda algo depois da sua aprovação. Ele exige testar o caminho de volta antes de remover. Preencha a parte `DADOS` e cole em um agente com acesso ao terminal do computador ligado ao tablet.
 
-O processo foi executado de ponta a ponta só no Galaxy S22.
+O processo foi executado de ponta a ponta só no HDT-7427GH.
 
 ## Problemas comuns
 
 | Problema | Solução |
 | --- | --- |
-| `adb devices` vazio, mas o Windows mostra o celular | A Depuração USB está desligada. Ative e aceite o aviso no celular |
-| `Shell does not have permission to access user 150` | É a Pasta Segura. Use sempre `--user 0` nos comandos `pm` |
-| `DELETE_FAILED_INTERNAL_ERROR` ao remover um app | O app também está na Pasta Segura. Ele sai do usuário principal mesmo assim; confira com `pm list packages --user 0` e apague pela Pasta Segura |
-| `df` ou `du` com caminho `C:/Program Files/Git/...` | O Git Bash converteu o caminho. Rode com `MSYS_NO_PATHCONV=1` |
-| `find /sdcard` não encontra nada | `/sdcard` é um atalho. Use `/storage/emulated/0/` |
-| `bg-dexopt-job` termina com "Job cancelled" | O celular não estava ocioso. Use `cmd package compile -m speed-profile -a` |
-| Tamanhos de `dumpsys diskstats` não mudam após limpar | Os tamanhos por app são recalculados uma vez por dia. Compare o `Data-Free` |
-| Um app removido fez falta | `adb shell cmd package install-existing NOME.DO.PACOTE` |
-| Apps removidos voltaram | Uma atualização do sistema pode reinstalá-los. Remova de novo |
+| `adb devices` vazio e o Windows mostra "Dispositivo USB MTP" (VID_0E8D) | A Depuração USB está desligada |
+| `unauthorized` mesmo depois de aceitar no tablet | `adb kill-server` e conecte de novo |
+| `Unknown command: install-existing` | Android 7.0: os removidos só voltam com restauração de fábrica |
+| `pm install -r` de um APK de `/system` falha com `code is missing` | O APK é odex; não há como reinstalar assim |
+| `Unknown option: -U`, `Can't find service: thermalservice`, `cmd role` | Não existem no Android 7. Veja as alternativas no [passo a passo](Tutoriais/Passo-a-passo-Hyundai-HDT-7427GH.md) |
+| `pm trim-caches` com SecurityException | Indisponível no Android 7 sem root |
+| Caminho vira `C:/Program Files/Git/...` | Rode com `MSYS_NO_PATHCONV=1` |
+| "Google Play Services não está respondendo" | Limite do hardware. Toque em **Aguarde**. Confira no logcat (`ANR in`) se começou antes de uma mudança |
+| Tablet trava durante as medidas | É esperado: cada medida fecha e reabre apps |
 
 ## Limites
 
 - **ADB não é antivírus.** Ele mostra indícios. Não encontrar nada não prova que o aparelho está limpo.
-- A Pasta Segura e os dados internos dos apps, como histórico de navegação, não podem ser lidos sem root.
-- Este guia não faz root, não desbloqueia o bootloader e não grava ROM.
-- Se houver app malicioso confirmado ou os sinais voltarem: troque as senhas **a partir de outro aparelho**, ative verificação em duas etapas, faça backup e considere restaurar o celular para o padrão de fábrica.
+- Um sistema sem atualização de segurança desde 2017 continua vulnerável depois da limpeza. Não use o tablet para banco, senhas ou compras.
+- 1 GB de RAM não aumenta. A limpeza tira o que não serve, mas não deixa o tablet rápido.
+- Este guia não faz root, não desbloqueia o bootloader e não grava ROM. Uma ROM alternativa mais nova não foi avaliada.
+- Se os sinais voltarem ou algo suspeito aparecer: troque a senha da conta **a partir de outro aparelho**, ative a verificação em duas etapas e faça a restauração de fábrica.
 
 ## Fontes
 
 - [ADB, documentação oficial do Android](https://developer.android.com/tools/adb)
-- [Configuração do ART e filtros de compilação](https://source.android.com/docs/core/runtime/configure)
+- Kryptowire, novembro de 2016: firmware ADUPS em celulares enviando mensagens e registros de chamadas para servidores na China (noticiado pelo New York Times em 15/11/2016)
+- [Family Link](https://families.google.com/familylink/)
 - [Universal Android Debloater Next Generation](https://github.com/Universal-Debloater-Alliance/universal-android-debloater-next-generation), lista pública usada para identificar pacotes
-- [AdGuard DNS](https://adguard-dns.io/)
 - [Projeto original para tablets](https://github.com/cavaleiro-ai/Tirando-defeito-programado-dos-tablets)
 
 ## Licença
 
-[MIT](LICENSE). Você pode usar, copiar e adaptar o guia, o prompt e os scripts, desde que mantenha o aviso de autoria. Não há garantia: confira cada pacote no seu aparelho antes de remover. O ADB, o AdGuard DNS e o Universal Android Debloater são projetos independentes, com licenças próprias.
+[MIT](LICENSE). Você pode usar, copiar e adaptar o guia, o prompt e os scripts, desde que mantenha o aviso de autoria. Não há garantia: confira cada pacote no seu aparelho antes de remover.
