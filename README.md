@@ -26,26 +26,28 @@ Inspirado em [cavaleiro-ai/Tirando-defeito-programado-dos-tablets](https://githu
 
 O tablet **não tinha vírus encontrado pelo ADB**. Isso não prova que ele está limpo, mas ele vinha com software de fábrica questionável: um atualizador chinês com módulo de analytics (ADUPS), a localização da Baidu e ferramentas de teste da fábrica. Esses foram removidos.
 
-A lentidão vem do **hardware**. O tablet tem 1 GB de RAM e processador de 2015, e roda um Google Play Services de 2026 que sozinho ocupa cerca de um terço da memória. Nenhuma limpeza por ADB muda isso. Ele serve para YouTube Kids, vídeos e jogos simples. Navegar na web com ele é lento e inseguro.
+A lentidão vem principalmente do **hardware**. O tablet tem 1 GB de RAM e processador de 2015, e roda um Google Play Services de 2026 que sozinho ocupa cerca de um terço da memória. Depois da limpeza e de um reinício, com o mesmo tempo de tablet ligado, Configurações passou a abrir em cerca de 0,9 s (antes, 1,6 a 1,9 s) e o Chrome em 3 a 5 s (antes, 6 a 48 s), mas o tablet continua limitado. Ele serve para YouTube Kids, vídeos e jogos simples. Navegar na web com ele é lento e inseguro.
 
 ## Resultados medidos
 
-Medidas pelo ADB com o tablet parado. O "antes" foi medido com 27 minutos de tablet ligado. O "depois" foi medido 3 minutos após reiniciar, quando o Play Services, a Play Store, o Fotos e o YouTube Kids ainda estão carregando, então ele não é comparável em RAM e tempo de abertura. A medida com o mesmo tempo de ligado (27 min) ainda será publicada.
+Medidas pelo ADB com o tablet parado, **ambas com 27 minutos de tablet ligado**. O "depois" inclui um reinício, então parte do ganho pode ser do próprio reinício: não dá para separar o efeito das remoções do efeito de reiniciar.
 
-| Medida | Antes (27 min ligado) | Depois (3 min após reiniciar) |
+| Medida | Antes | Depois |
 | --- | --- | --- |
 | Apps ativos | 116 | 98 |
-| RAM disponível | 345 MB | 285 MB |
-| Swap livre | 177 MB | 303 MB |
-| Espaço livre (/data) | 2,22 GB | 2,12 GB |
-| Carga média (1 min) | 9,4 | 17 a 22 |
-| Abrir Configurações (3 vezes) | 1937 / 1632 / 1720 ms | 5354 / 5156 / 1284 ms |
-| Abrir Chrome a frio (2 vezes) | 47,6 s / 6,4 s | sem leitura / 6,1 s |
+| RAM disponível | 345 MB | **464 MB** |
+| Swap livre | 177 MB | 248 MB |
+| Espaço livre (/data) | 2,22 GB | 2,09 GB |
+| Carga média (1 min) | 9,4 | 7,4 |
+| Abrir Configurações (3 vezes) | 1937 / 1632 / 1720 ms | **878 / 907 / 882 ms** |
+| Abrir Chrome a frio (2 vezes) | 47,6 s / 6,4 s | **5,0 s / 2,8 s** |
 | Busca de Wi-Fi e Bluetooth em segundo plano | ligada | desligada |
 | Localização | Alta precisão (GPS + rede) | Economia de bateria (só rede) |
-| ANRs do Play Services | pelo menos 2 (18:01 e 18:02) | 4 nos primeiros 7 min após reiniciar |
+| ANRs do Play Services | pelo menos 2 (18:01 e 18:02) | 4, todos nos primeiros 7 min após reiniciar; nenhum entre 7 e 27 min |
 
-Até aqui, **nenhuma medida mostra o tablet mais rápido**. O ganho comprovado é o de software: 18 pacotes desnecessários a menos, sem atualizador com analytics, sem localização da Baidu e sem ferramentas de fábrica. O espaço livre caiu 100 MB por causa das atualizações e da compilação da Play Store, não da limpeza.
+Logo depois de reiniciar (3 minutos), o tablet fica bem pior: RAM disponível de 285 MB, carga de 17 a 22 e Configurações abrindo em mais de 5 s, porque o Play Services, a Play Store, o Fotos e o YouTube Kids carregam todos ao mesmo tempo. **Depois de ligar, espere uns 10 minutos antes de entregar à criança.**
+
+O espaço livre caiu cerca de 130 MB por causa das atualizações e da compilação da Play Store, não da limpeza. Medidas feitas uma vez cada, sem benchmark: servem como indício, não como prova de um percentual de ganho.
 
 Situação de cada parte:
 
@@ -58,7 +60,7 @@ Situação de cada parte:
 | Compilação dos apps principais | Sem efeito | Já estavam compilados |
 | Limpeza de cache (`pm trim-caches`) | Indisponível | Android 7 nega a permissão |
 | Reverter as remoções por ADB | **Indisponível** | Só com restauração de fábrica ([detalhes](#antes-de-remover-o-caminho-de-volta)) |
-| "Google Play Services não está respondendo" | **Continua** | Já acontecia antes; é o limite do hardware |
+| "Google Play Services não está respondendo" | **Continua após reiniciar** | Já acontecia antes; 4 ANRs nos primeiros 7 min após o boot, nenhum entre 7 e 27 min |
 | Câmera, som, Bluetooth, YouTube Kids depois das remoções | Não testado pelo ADB | Testar no uso |
 
 ## O que a varredura encontrou
